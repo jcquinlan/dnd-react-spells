@@ -23,19 +23,25 @@ const Main = React.createClass({
 
 const List = React.createClass({
     getInitialState(){
-        return {filter: 'All'};
+        return {
+            class: 'All',
+            level: 'All'
+        };
     },
     render(){
         return (
             <div>
-                <h3>Filter: {this.state.filter.split(', ')[0]}</h3>
-                <FilterButtons updateFilter={this.updateFilter}/>
-                <SpellList filter={this.state.filter}/>
+                <h3>Filter: {this.state.class} + {this.state.level}</h3>
+                <FilterButtons updateClass={this.updateClass} updateLevel={this.updateLevel}/>
+                <SpellList classType={this.state.class} level={this.state.level} />
             </div>
         )
     },
-    updateFilter(filter){
-        this.setState({ filter: filter });
+    updateClass(filter){
+        this.setState({ class: filter });
+    },
+    updateLevel(filter){
+        this.setState({ level: filter });
     }
 });
 
@@ -56,22 +62,26 @@ const SpellList = React.createClass({
         )
     },
     getMeteorData(){
-        let filter = this.props.filter.split(', ');
+        let classFilter = this.props.classType;
+        let levelFilter = this.props.level;
 
-        if(filter[0] === "All") {
+        if(classFilter != "All" && levelFilter != "All") {
             return {
-                spells: Spells.find().fetch()
+                spells: Spells.find({ class: classFilter, level: levelFilter }).fetch()
             }
-        } else if (filter[0] === "level") {
+        } else if (classFilter === "All" && levelFilter === "All"){
             return {
-                spells: Spells.find({ level: filter[1] }).fetch()
+                spells: Spells.find({}).fetch()
             }
-        } else if (filter[0] === "class") {
+        } else if (classFilter === "All" && levelFilter != "All"){
             return {
-                spells: Spells.find({ class: filter[1] }).fetch()
+                spells: Spells.find({ level: levelFilter}).fetch()
+            }
+        } else if (classFilter != "All" && levelFilter === "All"){
+            return {
+                spells: Spells.find({ class: classFilter }).fetch()
             }
         }
-
     },
     renderSpells(){
         return this.data.spells.map((spell) => {
@@ -98,26 +108,32 @@ const FilterButtons = React.createClass({
     render(){
         return (
             <div>
-                <select onChange={this.handleChange} name="spell-filter" id="show-all">
-                  <option value="level, 1st-level">1st Level</option>
-                  <option value="level, 2nd-level">2nd Level</option>
-                  <option value="level, 3rd-level">3rd Level</option>
-                  <option value="level, 4th-level">4th Level</option>
+                <select onChange={this.updateLevel} name="spell-filter" id="level-filter">
+                  <option value="All">All Levels</option>
+                  <option value="1st-level">1st Level</option>
+                  <option value="2nd-level">2nd Level</option>
+                  <option value="3rd-level">3rd Level</option>
+                  <option value="4th-level">4th Level</option>
                 </select>
-                <label htmlFor="show-all">Level</label>
+                <label htmlFor="level-filter">Level</label>
 
-                <select onChange={this.handleChange} name="spell-filter" id="show-all">
-                  <option value="class, Bard">Bard</option>
-                  <option value="class, Warlock">Warlock</option>
-                  <option value="class, Fighter">Fighter</option>
-                  <option value="class, Wizard">Wizard</option>
+                <select onChange={this.updateClass} name="spell-filter" id="class-filter">
+                  <option value="All">All Classes</option>
+                  <option value="Bard">Bard</option>
+                  <option value="Warlock">Warlock</option>
+                  <option value="Fighter">Fighter</option>
+                  <option value="Wizard">Wizard</option>
                 </select>
-                <label htmlFor="show-all">Class</label>
+                <label htmlFor="class-filter">Class</label>
             </div>
         )
     },
-    handleChange(event){
+    updateClass(event){
         let value = event.target.value;
-        this.props.updateFilter(value);
+        this.props.updateClass(value);
+    },
+    updateLevel(event){
+        let value = event.target.value;
+        this.props.updateLevel(value);
     }
 });
