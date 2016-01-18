@@ -62,25 +62,13 @@ const SpellList = React.createClass({
         )
     },
     getMeteorData(){
-        let classFilter = this.props.classType;
-        let levelFilter = this.props.level;
+        let query = {};
 
-        if(classFilter != "All" && levelFilter != "All") {
-            return {
-                spells: Spells.find({ class: classFilter, level: levelFilter }).fetch()
-            }
-        } else if (classFilter === "All" && levelFilter === "All"){
-            return {
-                spells: Spells.find({}).fetch()
-            }
-        } else if (classFilter === "All" && levelFilter != "All"){
-            return {
-                spells: Spells.find({ level: levelFilter}).fetch()
-            }
-        } else if (classFilter != "All" && levelFilter === "All"){
-            return {
-                spells: Spells.find({ class: classFilter }).fetch()
-            }
+        if (this.props.classType !== 'All') query.class = this.props.classType;
+        if (this.props.level !== 'All') query.level = this.props.level;
+
+        return {
+            spells: Spells.find(query).fetch()
         }
     },
     renderSpells(){
@@ -123,6 +111,11 @@ const FilterButtons = React.createClass({
                   <option value="Warlock">Warlock</option>
                   <option value="Fighter">Fighter</option>
                   <option value="Wizard">Wizard</option>
+                  <option value="Sorcerer">Sorcerer</option>
+                  <option value="Druid">Druid</option>
+                  <option value="Ranger">Ranger</option>
+                  <option value="Cleric">Cleric</option>
+                  <option value="Paladin">Paladin</option>
                 </select>
                 <label htmlFor="class-filter">Class</label>
             </div>
